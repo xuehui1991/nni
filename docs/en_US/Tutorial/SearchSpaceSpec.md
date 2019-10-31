@@ -27,9 +27,8 @@ All types of sampling strategies and their parameter are listed here:
 
 * `{"_type": "choice", "_value": options}`
 
-  * Which means the variable's value is one of the options. Here 'options' should be a list. Each element of options is a number of string. It could also be a nested sub-search-space, this sub-search-space takes effect only when the corresponding element is chosen. The variables in this sub-search-space could be seen as conditional variables.
-
-  * An simple [example](https://github.com/microsoft/nni/tree/master/examples/trials/mnist-nested-search-space/search_space.json) of [nested] search space definition. If an element in the options list is a dict, it is a sub-search-space, and for our built-in tuners you have to add a key `_name` in this dict, which helps you to identify which element is chosen. Accordingly, here is a [sample](https://github.com/microsoft/nni/tree/master/examples/trials/mnist-nested-search-space/sample.json) which users can get from nni with nested search space definition. Tuners which support nested search space is as follows:
+  * Which means the variable's value is one of the options. Here `options` should be a list of numbers or a list of strings. Using arbitrary objects as members of this list (like sublists, a mixture of numbers and strings, or null values) should work in most cases, but may trigger undefined behaviors.
+  * `options` could also be a nested sub-search-space, this sub-search-space takes effect only when the corresponding element is chosen. The variables in this sub-search-space could be seen as conditional variables. Here is an simple [example of nested search space definition](https://github.com/microsoft/nni/tree/master/examples/trials/mnist-nested-search-space/search_space.json). If an element in the options list is a dict, it is a sub-search-space, and for our built-in tuners you have to add a key `_name` in this dict, which helps you to identify which element is chosen. Accordingly, here is a [sample](https://github.com/microsoft/nni/tree/master/examples/trials/mnist-nested-search-space/sample.json) which users can get from nni with nested search space definition. Tuners which support nested search space are as follows:
 
     - Random Search 
     - TPE
@@ -95,7 +94,7 @@ All types of sampling strategies and their parameter are listed here:
 
 Known Limitations:
 
-* Note that Metis Tuner only supports numerical `choice` now
+* GP Tuner and Metis Tuner support only **numerical values** in search space(`choice` type values can be no-numeraical with other tuners, e.g. string values). Both GP Tuner and Metis Tuner use Gaussian Process Regressor(GPR). GPR make predictions based on a kernel function and the 'distance' between different points, it's hard to get the true distance between no-numerical values.
 
 * Note that for nested search space:
 
