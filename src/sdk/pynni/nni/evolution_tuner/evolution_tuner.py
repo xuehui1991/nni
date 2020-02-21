@@ -35,13 +35,14 @@ def json2space(x, oldy=None, name=NodeType.ROOT):
             y.append(name)
         else:
             for key in x.keys():
-                y += json2space(x[key], oldy[key] if oldy else None, name+"[%s]" % str(key))
+                y += json2space(x[key], \
+                        (oldy[key] if oldy is not None else None), name+"[%s]" % str(key))
     elif isinstance(x, list):
         for i, x_i in enumerate(x):
             if isinstance(x_i, dict):
                 if NodeType.NAME not in x_i.keys():
                     raise RuntimeError('\'_name\' key is not found in this nested search space.')
-            y += json2space(x_i, oldy[i] if oldy else None, name + "[%d]" % i)
+            y += json2space(x_i, (oldy[i] if oldy is not None else None), name+"[%d]" % i)
     return y
 
 def json2parameter(x, is_rand, random_state, oldy=None, Rand=False, name=NodeType.ROOT):
@@ -60,14 +61,12 @@ def json2parameter(x, is_rand, random_state, oldy=None, Rand=False, name=NodeTyp
                     _index = random_state.randint(len(_value))
                     y = {
                         NodeType.INDEX: _index,
-                        NodeType.VALUE: json2parameter(
-                            x[NodeType.VALUE][_index],
-                            is_rand,
-                            random_state,
-                            None,
-                            Rand,
-                            name=name+"[%d]" % _index
-                        )
+                        NodeType.VALUE: json2parameter(x[NodeType.VALUE][_index],
+                                                       is_rand,
+                                                       random_state,
+                                                       None,
+                                                       Rand,
+                                                       name=name+"[%d]" % _index)
                     }
                 else:
                     y = getattr(parameter_expressions, _type)(*(_value + [random_state]))
@@ -76,28 +75,16 @@ def json2parameter(x, is_rand, random_state, oldy=None, Rand=False, name=NodeTyp
         else:
             y = dict()
             for key in x.keys():
-                y[key] = json2parameter(
-                    x[key],
-                    is_rand,
-                    random_state,
-                    oldy[key] if oldy else None,
-                    Rand,
-                    name + "[%s]" % str(key)
-                )
+                y[key] = json2parameter(x[key], is_rand, random_state, oldy[key] \
+                            if oldy is not None else None, Rand, name + "[%s]" % str(key))
     elif isinstance(x, list):
         y = list()
         for i, x_i in enumerate(x):
             if isinstance(x_i, dict):
                 if NodeType.NAME not in x_i.keys():
                     raise RuntimeError('\'_name\' key is not found in this nested search space.')
-            y.append(json2parameter(
-                x_i,
-                is_rand,
-                random_state,
-                oldy[i] if oldy else None,
-                Rand,
-                name + "[%d]" % i
-            ))
+            y.append(json2parameter(x_i, is_rand, random_state, oldy[i]
+                                    if oldy is not None else None, Rand, name + "[%d]" % i))
     else:
         y = copy.deepcopy(x)
     return y
@@ -216,7 +203,7 @@ class EvolutionTuner(Tuner):
 
         Returns
         -------
-        dict
+        config : dict
             A group of candaidte parameters that evolution tuner generated.
         """
         if not self.population:

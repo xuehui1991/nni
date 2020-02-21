@@ -1,16 +1,35 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
+# Copyright (c) Microsoft Corporation
+# All rights reserved.
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge,
+# to any person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and
+# to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
 """
 metis_tuner.py
 """
 
 import copy
 import logging
+
+from multiprocessing.dummy import Pool as ThreadPool
+import warnings
 import random
 import statistics
-import warnings
-from multiprocessing.dummy import Pool as ThreadPool
+
 import numpy as np
 
 import nni.metis_tuner.lib_constraint_summation as lib_constraint_summation
@@ -129,8 +148,8 @@ class MetisTuner(Tuner):
         self.minimize_constraints_fun = None
         self.minimize_starting_points = None
         self.supplement_data_num = 0
-        self.x_bounds = []
-        self.x_types = []
+        self.x_bounds = None
+        self.x_types = None
 
 
     def update_search_space(self, search_space):
@@ -190,7 +209,7 @@ class MetisTuner(Tuner):
                         "Metis Tuner doesn't support this kind of variable: %s",
                         str(key_type))
                     raise RuntimeError(
-                        "Metis Tuner doesn't support this kind of variable: %s" %
+                        "Metis Tuner doesn't support this kind of variable: %s",
                         str(key_type))
         else:
             logger.info("The format of search space is not a dict.")
@@ -339,12 +358,10 @@ class MetisTuner(Tuner):
             minimize_constraints_fun=minimize_constraints_fun)
         if not lm_current:
             return None
-        logger.info({
-            'hyperparameter': lm_current['hyperparameter'],
-            'expected_mu': lm_current['expected_mu'],
-            'expected_sigma': lm_current['expected_sigma'],
-            'reason': "exploitation_gp"
-        })
+        logger.info({'hyperparameter': lm_current['hyperparameter'],
+                     'expected_mu': lm_current['expected_mu'],
+                     'expected_sigma': lm_current['expected_sigma'],
+                     'reason': "exploitation_gp"})
 
         if no_candidates is False:
             # ===== STEP 2: Get recommended configurations for exploration ====
@@ -358,13 +375,15 @@ class MetisTuner(Tuner):
                 minimize_constraints_fun=minimize_constraints_fun)
 
             if results_exploration is not None:
-                if _num_past_samples(results_exploration['hyperparameter'], samples_x, samples_y) == 0:
+                if _num_past_samples(
+                        results_exploration['hyperparameter'],
+                        samples_x,
+                        samples_y) == 0:
                     temp_candidate = {
                         'hyperparameter': results_exploration['hyperparameter'],
                         'expected_mu': results_exploration['expected_mu'],
                         'expected_sigma': results_exploration['expected_sigma'],
-                        'reason': "exploration"
-                    }
+                        'reason': "exploration"}
                     candidates.append(temp_candidate)
 
                     logger.info("DEBUG: 1 exploration candidate selected\n")
@@ -399,15 +418,17 @@ class MetisTuner(Tuner):
                             minimize_constraints_fun=minimize_constraints_fun)
 
                     if results_exploitation is not None:
-                        if _num_past_samples(results_exploitation['hyperparameter'], samples_x, samples_y) == 0:
-                            temp_expected_mu, temp_expected_sigma = \
-                                    gp_prediction.predict(results_exploitation['hyperparameter'], gp_model['model'])
+                        if _num_past_samples(
+                                results_exploitation['hyperparameter'],
+                                samples_x,
+                                samples_y) == 0:
+                            temp_expected_mu, temp_expected_sigma = gp_prediction.predict(
+                                results_exploitation['hyperparameter'], gp_model['model'])
                             temp_candidate = {
                                 'hyperparameter': results_exploitation['hyperparameter'],
                                 'expected_mu': temp_expected_mu,
                                 'expected_sigma': temp_expected_sigma,
-                                'reason': "exploitation_gmm"
-                            }
+                                'reason': "exploitation_gmm"}
                             candidates.append(temp_candidate)
 
                             logger.info(
@@ -436,12 +457,16 @@ class MetisTuner(Tuner):
                     samples_x, samples_y_aggregation)
 
                 if results_outliers is not None:
-                    for results_outlier in results_outliers:  # pylint: disable=not-an-iterable
-                        if _num_past_samples(samples_x[results_outlier['samples_idx']], samples_x, samples_y) < max_resampling_per_x:
-                            temp_candidate = {'hyperparameter': samples_x[results_outlier['samples_idx']],\
-                                               'expected_mu': results_outlier['expected_mu'],\
-                                               'expected_sigma': results_outlier['expected_sigma'],\
-                                               'reason': "resampling"}
+                    for results_outlier in results_outliers:
+                        if _num_past_samples(
+                                samples_x[results_outlier['samples_idx']],
+                                samples_x, samples_y) < max_resampling_per_x:
+                            temp_candidate = {
+                                'hyperparameter': samples_x[
+                                    results_outlier['samples_idx']],
+                                'expected_mu': results_outlier['expected_mu'],
+                                'expected_sigma': results_outlier['expected_sigma'],
+                                'reason': "resampling"}
                             candidates.append(temp_candidate)
                     logger.info("DEBUG: %d re-sampling candidates selected\n")
                     logger.info(temp_candidate)
@@ -521,14 +546,17 @@ class MetisTuner(Tuner):
         """
         _completed_num = 0
         for trial_info in data:
-            logger.info("Importing data, current processing progress %s / %s", _completed_num, len(data))
+            logger.info(
+                "Importing data, current processing progress %s / %s", _completed_num, len(data))
             _completed_num += 1
             assert "parameter" in trial_info
             _params = trial_info["parameter"]
             assert "value" in trial_info
             _value = trial_info['value']
             if not _value:
-                logger.info("Useless trial data, value is %s, skip this trial data.", _value)
+                logger.info(
+                    "Useless trial data, value is %s, skip this trial data.",
+                    _value)
                 continue
             self.supplement_data_num += 1
             _parameter_id = '_'.join(

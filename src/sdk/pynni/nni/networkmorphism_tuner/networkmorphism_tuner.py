@@ -1,6 +1,22 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
+# Copyright (c) Microsoft Corporation. All rights reserved.
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+# associated documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish, distribute,
+# sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or
+# substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+# NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+# OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# ==================================================================================================
 """
 networkmorphsim_tuner.py
 """
@@ -22,31 +38,31 @@ logger = logging.getLogger("NetworkMorphism_AutoML")
 class NetworkMorphismTuner(Tuner):
     """
     NetworkMorphismTuner is a tuner which using network morphism techniques.
-
+    
     Attributes
     ----------
     n_classes : int
-        The class number or output node number (default: ``10``)
+        The class number or output node number (default: {10})
     input_shape : tuple
         A tuple including: (input_width, input_width, input_channel)
     t_min : float
-        The minimum temperature for simulated annealing. (default: ``Constant.T_MIN``)
+        The minimum temperature for simulated annealing. (default: {Constant.T_MIN})
     beta : float
-        The beta in acquisition function. (default: ``Constant.BETA``)
+        The beta in acquisition function. (default: {Constant.BETA})
     algorithm_name : str
-        algorithm name used in the network morphism (default: ``"Bayesian"``)
+        algorithm name used in the network morphism (default: {"Bayesian"})
     optimize_mode : str
-        optimize mode "minimize" or "maximize" (default: ``"minimize"``)
+        optimize mode "minimize" or "maximize" (default: {"minimize"})
     verbose : bool
-        verbose to print the log (default: ``True``)
+        verbose to print the log (default: {True})
     bo : BayesianOptimizer
         The optimizer used in networkmorphsim tuner.
     max_model_size : int
-        max model size to the graph (default: ``Constant.MAX_MODEL_SIZE``)
+        max model size to the graph (default: {Constant.MAX_MODEL_SIZE})
     default_model_len : int
-        default model length (default: ``Constant.MODEL_LEN``)
+        default model length (default: {Constant.MODEL_LEN})
     default_model_width : int
-        default model width (default: ``Constant.MODEL_WIDTH``)
+        default model width (default: {Constant.MODEL_WIDTH})
     search_space : dict
     """
 
@@ -68,6 +84,35 @@ class NetworkMorphismTuner(Tuner):
     ):
         """
         initilizer of the NetworkMorphismTuner.
+
+        Parameters
+        ----------
+        task : str
+            task mode, such as "cv","common" etc. (default: {"cv"})
+        input_width : int
+            input sample shape (default: {32})
+        input_channel : int
+            input sample shape (default: {3})
+        n_output_node : int
+            output node number (default: {10})
+        algorithm_name : str
+            algorithm name used in the network morphism (default: {"Bayesian"})
+        optimize_mode : str
+            optimize mode "minimize" or "maximize" (default: {"minimize"})
+        path : str
+            default mode path to save the model file (default: {"model_path"})
+        verbose : bool
+            verbose to print the log (default: {True})
+        beta : float
+            The beta in acquisition function. (default: {Constant.BETA})
+        t_min : float
+            The minimum temperature for simulated annealing. (default: {Constant.T_MIN})
+        max_model_size : int
+            max model size to the graph (default: {Constant.MAX_MODEL_SIZE})
+        default_model_len : int
+            default model length (default: {Constant.MODEL_LEN})
+        default_model_width : int
+            default model width (default: {Constant.MODEL_WIDTH})
         """
 
         if not os.path.exists(path):

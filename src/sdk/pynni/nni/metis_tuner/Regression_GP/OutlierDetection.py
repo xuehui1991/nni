@@ -1,6 +1,23 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
+# Copyright (c) Microsoft Corporation
+# All rights reserved.
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge,
+# to any person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and
+# to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
 """
 OutlierDectection.py
 """
@@ -59,7 +76,7 @@ def outlierDetection_threaded(samples_x, samples_y_aggregation):
         if threads_result is not None:
             outliers.append(threads_result)
         else:
-            print("Error: threads_result is None.")
+            sys.stderr.write("Error: threads_result is None.")
 
     outliers = outliers if outliers else None
     return outliers
@@ -67,12 +84,13 @@ def outlierDetection_threaded(samples_x, samples_y_aggregation):
 
 def outlierDetection(samples_x, samples_y_aggregation):
     outliers = []
-    for samples_idx, _ in enumerate(samples_x):
-        #sys.stderr.write("[%s] DEBUG: Evaluating %d of %d samples\n"
-        #  \ % (os.path.basename(__file__), samples_idx + 1, len(samples_x)))
-        diagnostic_regressor_gp = gp_create_model.create_model(\
-                                        samples_x[0:samples_idx] + samples_x[samples_idx + 1:],\
-                                        samples_y_aggregation[0:samples_idx] + samples_y_aggregation[samples_idx + 1:])
+    for samples_idx in range(0, len(samples_x)):
+        sys.stderr.write("[%s] DEBUG: Evaluating %d of %d samples\n" \
+            % (os.path.basename(__file__), samples_idx + 1, len(samples_x)))
+
+        diagnostic_regressor_gp = gp_create_model.create_model(
+            samples_x[0:samples_idx] + samples_x[samples_idx + 1:],
+            samples_y_aggregation[0:samples_idx] + samples_y_aggregation[samples_idx + 1:])
         mu, sigma = gp_prediction.predict(samples_x[samples_idx],
                                           diagnostic_regressor_gp['model'])
         # 2.33 is the z-score for 98% confidence level

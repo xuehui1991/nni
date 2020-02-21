@@ -11,9 +11,8 @@ from nni.networkmorphism_tuner.utils import Constant
 
 
 class AvgPool(nn.Module):
-    """
-    AvgPool Module.
-    """
+    '''AvgPool Module.
+    '''
 
     def __init__(self):
         super().__init__()
@@ -24,9 +23,8 @@ class AvgPool(nn.Module):
 
 
 class GlobalAvgPool1d(AvgPool):
-    """
-    GlobalAvgPool1d Module.
-    """
+    '''GlobalAvgPool1d Module.
+    '''
 
     def forward(self, input_tensor):
         return functional.avg_pool1d(input_tensor, input_tensor.size()[2:]).view(
@@ -35,9 +33,8 @@ class GlobalAvgPool1d(AvgPool):
 
 
 class GlobalAvgPool2d(AvgPool):
-    """
-    GlobalAvgPool2d Module.
-    """
+    '''GlobalAvgPool2d Module.
+    '''
 
     def forward(self, input_tensor):
         return functional.avg_pool2d(input_tensor, input_tensor.size()[2:]).view(
@@ -46,9 +43,8 @@ class GlobalAvgPool2d(AvgPool):
 
 
 class GlobalAvgPool3d(AvgPool):
-    """
-    GlobalAvgPool3d Module.
-    """
+    '''GlobalAvgPool3d Module.
+    '''
 
     def forward(self, input_tensor):
         return functional.avg_pool3d(input_tensor, input_tensor.size()[2:]).view(
@@ -57,9 +53,8 @@ class GlobalAvgPool3d(AvgPool):
 
 
 class StubLayer:
-    """
-    StubLayer Module. Base Module.
-    """
+    '''StubLayer Module. Base Module.
+    '''
 
     def __init__(self, input_node=None, output_node=None):
         self.input = input_node
@@ -129,9 +124,8 @@ class StubLayer:
 
 
 class StubWeightBiasLayer(StubLayer):
-    """
-    StubWeightBiasLayer Module to set the bias.
-    """
+    '''StubWeightBiasLayer Module to set the bias.
+    '''
 
     def import_weights(self, torch_layer):
         self.set_weights(
@@ -151,9 +145,8 @@ class StubWeightBiasLayer(StubLayer):
 
 
 class StubBatchNormalization(StubWeightBiasLayer):
-    """
-    StubBatchNormalization Module. Batch Norm.
-    """
+    '''StubBatchNormalization Module. Batch Norm.
+    '''
 
     def __init__(self, num_features, input_node=None, output_node=None):
         super().__init__(input_node, output_node)
@@ -184,36 +177,32 @@ class StubBatchNormalization(StubWeightBiasLayer):
 
 
 class StubBatchNormalization1d(StubBatchNormalization):
-    """
-    StubBatchNormalization1d Module.
-    """
+    '''StubBatchNormalization1d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.BatchNorm1d(self.num_features)
 
 
 class StubBatchNormalization2d(StubBatchNormalization):
-    """
-    StubBatchNormalization2d Module.
-    """
+    '''StubBatchNormalization2d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.BatchNorm2d(self.num_features)
 
 
 class StubBatchNormalization3d(StubBatchNormalization):
-    """
-    StubBatchNormalization3d Module.
-    """
+    '''StubBatchNormalization3d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.BatchNorm3d(self.num_features)
 
 
 class StubDense(StubWeightBiasLayer):
-    """
-    StubDense Module. Linear.
-    """
+    '''StubDense Module. Linear.
+    '''
 
     def __init__(self, input_units, units, input_node=None, output_node=None):
         super().__init__(input_node, output_node)
@@ -240,9 +229,8 @@ class StubDense(StubWeightBiasLayer):
 
 
 class StubConv(StubWeightBiasLayer):
-    """
-    StubConv Module. Conv.
-    """
+    '''StubConv Module. Conv.
+    '''
 
     def __init__(self, input_channel, filters, kernel_size,
                  stride=1, input_node=None, output_node=None):
@@ -297,9 +285,8 @@ class StubConv(StubWeightBiasLayer):
 
 
 class StubConv1d(StubConv):
-    """
-    StubConv1d Module.
-    """
+    '''StubConv1d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.Conv1d(
@@ -312,9 +299,8 @@ class StubConv1d(StubConv):
 
 
 class StubConv2d(StubConv):
-    """
-    StubConv2d Module.
-    """
+    '''StubConv2d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.Conv2d(
@@ -327,9 +313,8 @@ class StubConv2d(StubConv):
 
 
 class StubConv3d(StubConv):
-    """
-    StubConv3d Module.
-    """
+    '''StubConv3d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.Conv3d(
@@ -342,9 +327,8 @@ class StubConv3d(StubConv):
 
 
 class StubAggregateLayer(StubLayer):
-    """
-    StubAggregateLayer Module.
-    """
+    '''StubAggregateLayer Module.
+    '''
 
     def __init__(self, input_nodes=None, output_node=None):
         if input_nodes is None:
@@ -395,27 +379,24 @@ class StubFlatten(StubLayer):
 
 
 class StubReLU(StubLayer):
-    """
-    StubReLU Module.
-    """
+    '''StubReLU Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.ReLU()
 
 
 class StubSoftmax(StubLayer):
-    """
-    StubSoftmax Module.
-    """
+    '''StubSoftmax Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.LogSoftmax(dim=1)
 
 
 class StubDropout(StubLayer):
-    """
-    StubDropout Module.
-    """
+    '''StubDropout Module.
+    '''
 
     def __init__(self, rate, input_node=None, output_node=None):
         super().__init__(input_node, output_node)
@@ -427,36 +408,32 @@ class StubDropout(StubLayer):
 
 
 class StubDropout1d(StubDropout):
-    """
-    StubDropout1d Module.
-    """
+    '''StubDropout1d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.Dropout(self.rate)
 
 
 class StubDropout2d(StubDropout):
-    """
-    StubDropout2d Module.
-    """
+    '''StubDropout2d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.Dropout2d(self.rate)
 
 
 class StubDropout3d(StubDropout):
-    """
-    StubDropout3d Module.
-    """
+    '''StubDropout3d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.Dropout3d(self.rate)
 
 
 class StubInput(StubLayer):
-    """
-    StubInput Module.
-    """
+    '''StubInput Module.
+    '''
 
     def __init__(self, input_node=None, output_node=None):
         super().__init__(input_node, output_node)
@@ -503,27 +480,24 @@ class StubPooling1d(StubPooling):
 
 
 class StubPooling2d(StubPooling):
-    """
-    StubPooling2d Module.
-    """
+    '''StubPooling2d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.MaxPool2d(self.kernel_size, stride=self.stride)
 
 
 class StubPooling3d(StubPooling):
-    """
-    StubPooling3d Module.
-    """
+    '''StubPooling3d Module.
+    '''
 
     def to_real_layer(self):
         return torch.nn.MaxPool3d(self.kernel_size, stride=self.stride)
 
 
 class StubGlobalPooling(StubLayer):
-    """
-    StubGlobalPooling Module.
-    """
+    '''StubGlobalPooling Module.
+    '''
 
     def __init__(self, input_node=None, output_node=None):
         super().__init__(input_node, output_node)
@@ -538,54 +512,48 @@ class StubGlobalPooling(StubLayer):
 
 
 class StubGlobalPooling1d(StubGlobalPooling):
-    """
-    StubGlobalPooling1d Module.
-    """
+    '''StubGlobalPooling1d Module.
+    '''
 
     def to_real_layer(self):
         return GlobalAvgPool1d()
 
 
 class StubGlobalPooling2d(StubGlobalPooling):
-    """
-    StubGlobalPooling2d Module.
-    """
+    '''StubGlobalPooling2d Module.
+    '''
 
     def to_real_layer(self):
         return GlobalAvgPool2d()
 
 
 class StubGlobalPooling3d(StubGlobalPooling):
-    """
-    StubGlobalPooling3d Module.
-    """
+    '''StubGlobalPooling3d Module.
+    '''
 
     def to_real_layer(self):
         return GlobalAvgPool3d()
 
 
 class TorchConcatenate(nn.Module):
-    """
-    TorchConcatenate Module.
-    """
+    '''TorchConcatenate Module.
+    '''
 
     def forward(self, input_list):
         return torch.cat(input_list, dim=1)
 
 
 class TorchAdd(nn.Module):
-    """
-    TorchAdd Module.
-    """
+    '''TorchAdd Module.
+    '''
 
     def forward(self, input_list):
         return input_list[0] + input_list[1]
 
 
 class TorchFlatten(nn.Module):
-    """
-    TorchFlatten Module.
-    """
+    '''TorchFlatten Module.
+    '''
 
     def forward(self, input_tensor):
         return input_tensor.view(input_tensor.size(0), -1)
@@ -768,7 +736,8 @@ def layer_description_builder(layer_information, id_to_node):
         kernel_size = layer_information[3]
         stride = layer_information[4]
         padding = layer_information[5]
-        return globals()[layer_type](kernel_size, stride, padding, layer_input, layer_output)
+        return eval(layer_type)(kernel_size, stride,
+                                padding, layer_input, layer_output)
     else:
         return globals()[layer_type](layer_input, layer_output)
 

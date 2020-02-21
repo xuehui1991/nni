@@ -24,15 +24,18 @@ class BatchTuner(Tuner):
     Examples
     --------
     The search space only be accepted like:
+    {
+        'combine_params': { '_type': 'choice',
+                             '_value': '[{...}, {...}, {...}]',
+                          }
+    }
 
-        ::
-
-            {'combine_params':
-                { '_type': 'choice',
-                            '_value': '[{...}, {...}, {...}]',
-                }
-            }
-
+    Attributes
+    ----------
+    count : int
+        count is the number of parameters that tuner has generated.
+    values : list
+        values is to save all the candidates contains in search space.
     """
 
     def __init__(self):
@@ -105,8 +108,13 @@ class BatchTuner(Tuner):
         data:
             a list of dictionarys, each of which has at least two keys, 'parameter' and 'value'
         """
+<<<<<<< HEAD
         if not self._values:
             LOGGER.info("Search space has not been initialized, skip this data import")
+=======
+        if len(self.values) == 0:
+            LOGGER .info("Search space has not been initialized, skip this data import")
+>>>>>>> 8d63e001490b0e46032177eb23e61fa091368ae6
             return
 
         self._values = self._values[(self._count+1):]
@@ -122,10 +130,18 @@ class BatchTuner(Tuner):
             assert "value" in trial_info
             _value = trial_info['value']
             if not _value:
+<<<<<<< HEAD
                 LOGGER.info("Useless trial data, value is %s, skip this trial data.", _value)
                 continue
             _completed_num += 1
             if _params in self._values:
                 self._values.remove(_params)
+=======
+                LOGGER .info("Useless trial data, value is %s, skip this trial data.", _value)
+                continue
+            _completed_num += 1
+            if _params in self.values:
+                self.values.remove(_params)
+>>>>>>> 8d63e001490b0e46032177eb23e61fa091368ae6
         LOGGER .info("Successfully import data to batch tuner, \
                         total data: %d, imported data: %d.", len(data), _completed_num)
